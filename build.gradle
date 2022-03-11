@@ -14,14 +14,21 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.squareup.okhttp3:okhttp:4.9.0'
-    implementation 'commons-io:commons-io:2.11.0'
+    // Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    // Mikoto
+    implementation 'net.mikoto.pixiv:pixiv-api:1.2.0'
+
+    // Others
+    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+    implementation 'commons-io:commons-io:2.11.0'
+    implementation 'commons-codec:commons-codec:1.15'
     implementation 'org.jetbrains:annotations:22.0.0'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    implementation 'net.mikoto.pixiv:pixiv-api:1.1.0'
     implementation 'com.alibaba:fastjson:1.2.79'
+
+    // Test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 tasks.named('test') {
