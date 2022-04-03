@@ -2,7 +2,7 @@ package net.mikoto.pixiv.central.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import net.mikoto.pixiv.api.http.central.patcher.Login;
-import net.mikoto.pixiv.api.service.central.PatcherService;
+import net.mikoto.pixiv.central.service.PatcherService;
 import net.mikoto.pixiv.central.service.impl.PatcherServiceImpl;
 import okhttp3.OkHttpClient;
 import org.jetbrains.annotations.NotNull;

@@ -1,7 +1,7 @@
 package net.mikoto.pixiv.central.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import net.mikoto.pixiv.api.service.central.PatcherService;
+import net.mikoto.pixiv.central.service.PatcherService;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;

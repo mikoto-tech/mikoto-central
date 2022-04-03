@@ -1,7 +1,7 @@
 package net.mikoto.pixiv.central.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import net.mikoto.pixiv.api.service.central.CaptchaService;
+import net.mikoto.pixiv.central.service.CaptchaService;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 

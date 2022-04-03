@@ -23,7 +23,7 @@ public class WebController implements PublicKey {
             method = RequestMethod.GET
     )
     @Override
-    public String getPublicKeyHttpApi(@NotNull HttpServletResponse response) {
+    public String publicKeyHttpApi(@NotNull HttpServletResponse response) {
         // SetHeader
         response.setContentType("text/html;charset=UTF-8");
         response.setHeader("Access-Control-Allow-Origin", "*");
