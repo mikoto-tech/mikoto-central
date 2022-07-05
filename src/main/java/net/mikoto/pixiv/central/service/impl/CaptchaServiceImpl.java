@@ -1,49 +1,39 @@
 package net.mikoto.pixiv.central.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
+import net.mikoto.pixiv.central.client.RecaptchaClient;
 import net.mikoto.pixiv.central.service.CaptchaService;
-import okhttp3.*;
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
-import java.util.Objects;
-
-import static net.mikoto.pixiv.central.constant.Properties.MAIN_PROPERTIES;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * @author mikoto
- * @date 2022/2/19 1:15
+ * Created at 2022/7/5, 下午5:12
+ * For pixiv-central
  */
+@Service
 public class CaptchaServiceImpl implements CaptchaService {
-    public static final String RE_CAPTCHA_CONFIRM_API = "https://www.google.com/recaptcha/api/siteverify";
-    private static final MediaType FROM = MediaType.get("application/x-www-form-urlencoded;charset=utf-8");
-    private static final String SUCCESS_KEY = "success";
+    private final RecaptchaClient recaptchaClient;
+
+    @Value("${mikoto.pixiv.secret}")
+    private String secret;
+
+    @Autowired
+    public CaptchaServiceImpl(RecaptchaClient recaptchaClient) {
+        this.recaptchaClient = recaptchaClient;
+    }
 
     /**
      * Verify a captcha.
      *
-     * @param okHttpClient      The ok http client.
-     * @param reCaptchaResponse The response of re captcha.
-     * @return Json result.
+     * @param response The response of the captcha.
+     * @param remoteIp The remote ip of user.
+     * @return The result.
      */
     @Override
-    public boolean verifyCaptcha(@NotNull OkHttpClient okHttpClient, String reCaptchaResponse) throws IOException {
-        // Verify
-        // build request
-        String verifyRequestString = "secret=" +
-                MAIN_PROPERTIES.getProperty("RECAPTCHA_KEY") +
-                "&response=" +
-                reCaptchaResponse;
-        RequestBody body = RequestBody.create(verifyRequestString, FROM);
-        Request verifyRequest = new Request.Builder()
-                .url(RE_CAPTCHA_CONFIRM_API)
-                .post(body)
-                .build();
-        // execute a call
-        Response verifyResponse = okHttpClient.newCall(verifyRequest).execute();
-        // load json
-        JSONObject verifyResponseJson = JSONObject.parseObject(Objects.requireNonNull(verifyResponse.body()).string());
-
-        return verifyResponseJson.getBoolean(SUCCESS_KEY);
+    public boolean verifyCaptcha(String response, String remoteIp) {
+        JSONObject resultJson = JSONObject.parseObject(recaptchaClient.verifyCaptcha(secret, response, remoteIp));
+        return resultJson.getBooleanValue("success");
     }
 }

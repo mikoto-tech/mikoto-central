@@ -7,8 +7,6 @@ Mikoto-Pixiv-Central 是整个Mikoto-Pixiv的核心部分
 仅仅负责以下任务:
 
 - User的注册/登录
-- Pixiv-Patcher的登录
-- 弱化其他部分与 [Pixiv-Database](https://github.com/mikoto2464/pixiv-database) 的联系
 
 ## 声明
 

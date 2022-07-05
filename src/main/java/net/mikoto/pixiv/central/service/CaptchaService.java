@@ -1,21 +1,17 @@
 package net.mikoto.pixiv.central.service;
 
-import okhttp3.OkHttpClient;
-
-import java.io.IOException;
-
 /**
  * @author mikoto
- * @date 2022/2/19 1:14
+ * Created at 2022/7/5, 下午5:12
+ * For pixiv-central
  */
 public interface CaptchaService {
     /**
      * Verify a captcha.
      *
-     * @param okHttpClient      The ok http client.
-     * @param reCaptchaResponse The response of re captcha.
-     * @return A boolean
-     * @throws IOException An error.
+     * @param response The response of the captcha.
+     * @param remoteIp The remote ip of user.
+     * @return The result.
      */
-    boolean verifyCaptcha(OkHttpClient okHttpClient, String reCaptchaResponse) throws IOException;
+    boolean verifyCaptcha(String response, String remoteIp);
 }
