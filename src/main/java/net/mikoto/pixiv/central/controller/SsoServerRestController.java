@@ -1,10 +1,12 @@
 package net.mikoto.pixiv.central.controller;
 
 import cn.dev33.satoken.config.SaSsoConfig;
+import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.sso.SaSsoHandle;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
 import com.alibaba.fastjson2.JSONObject;
-import com.ejlchina.okhttps.OkHttps;
+import com.dtflys.forest.Forest;
 import net.mikoto.pixiv.central.dao.UserRepository;
 import net.mikoto.pixiv.central.service.CaptchaService;
 import net.mikoto.pixiv.core.model.User;
@@ -111,31 +113,39 @@ public class SsoServerRestController {
             return modelAndView;
         });
 
-        sso.setDoLoginHandle((encryptedUserName, encryptedUserPassword) -> {
-//            String userName;
-//            String userPassword;
-//            try {
-//                userName = decrypt(encryptedUserName, getPrivateKey(privateKey));
-//                userPassword = decrypt(encryptedUserPassword, getPrivateKey(privateKey));
-//            } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
-//                     IllegalBlockSizeException | BadPaddingException | IOException | InvalidKeySpecException e) {
-//                throw new RuntimeException(e);
-//            }
+        sso.setDoLoginHandle((encryptedUserName, encryptedUserRawPassword) -> {
 
-            User user = userRepository.getUserByUserName(encryptedUserName);
+            try {
+                String userName = decrypt(encryptedUserName, getPrivateKey(privateKey));
+                String userRawPassword = decrypt(encryptedUserRawPassword, getPrivateKey(privateKey));
+                String reCaptchaResponse = SaHolder.getRequest().getParam("reCaptchaResponse");
 
-//            if ("sa".equals(userName) && "123456".equals(userPassword)) {
-//                StpUtil.login(10001);
-//                return SaResult.ok("登录成功！").setData(StpUtil.getTokenValue());
-//            }
-            return SaResult.error("登录失败！");
+                User user = userRepository.getUserByUserName(userName);
+
+                if (user == null) {
+                    throw new NullPointerException("No such user.");
+                }
+
+                String userPassword = userRawPassword +
+                        "|MIKOTO_PIXIV_SSO|" +
+                        user.getUserSalt() +
+                        "|LOVE YOU FOREVER, Lin.";
+
+                if (user.getUserPassword().equals(userPassword) &&
+                        captchaService.verify(secret, reCaptchaResponse)) {
+                    StpUtil.login(user.getUserId());
+                    return SaResult.ok("Login success!").setData(StpUtil.getTokenValue());
+                }
+                return SaResult.error("Login failed");
+            } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
+                     IllegalBlockSizeException | BadPaddingException | IOException | InvalidKeySpecException e) {
+                throw new RuntimeException(e);
+            }
         });
 
         sso.setSendHttp(url -> {
             try {
-                // 发起 http 请求
-                System.out.println("Send request to:" + url);
-                return OkHttps.sync(url).get().getBody().toString();
+                return Forest.get(url).executeAsString();
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
