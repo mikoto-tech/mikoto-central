@@ -6,9 +6,24 @@ import org.springframework.stereotype.Repository;
 
 /**
  * @author mikoto
- * Created at 2022/7/5, 下午6:19
- * For pixiv-central
+ * Create for pixiv-central
+ * Create at 2022/7/21
  */
 @Repository("userRepository")
 public interface UserRepository extends JpaRepository<User, Integer> {
+    /**
+     * Get the user by user's id.
+     *
+     * @param userId The user's id.
+     * @return The user.
+     */
+    User getUserByUserId(int userId);
+
+    /**
+     * Get the user by user's name.
+     *
+     * @param userName The user's name.
+     * @return The user.
+     */
+    User getUserByUserName(String userName);
 }

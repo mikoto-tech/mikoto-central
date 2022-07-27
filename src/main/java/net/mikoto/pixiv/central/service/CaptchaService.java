@@ -1,17 +1,19 @@
 package net.mikoto.pixiv.central.service;
 
+import java.io.IOException;
+
 /**
  * @author mikoto
- * Created at 2022/7/5, 下午5:12
- * For pixiv-central
+ * Create for pixiv-central
+ * Create at 2022/7/21
  */
 public interface CaptchaService {
     /**
-     * Verify a captcha.
+     * Verify the response.
      *
-     * @param response The response of the captcha.
-     * @param remoteIp The remote ip of user.
-     * @return The result.
+     * @param secret            The secret.
+     * @param reCaptchaResponse The response.
+     * @return
      */
-    boolean verifyCaptcha(String response, String remoteIp);
+    boolean verify(String secret, String reCaptchaResponse) throws IOException;
 }

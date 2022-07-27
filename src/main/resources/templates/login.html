@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Mikoto-Pixiv-SSO-Login</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <link
+            href="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/css/bootstrap.min.css"
+            rel="stylesheet"
+    />
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/js/bootstrap.bundle.min.js"></script>
+    <link
+            href="https://cdn.staticfile.org/font-awesome/6.1.1/css/all.min.css"
+            rel="stylesheet"
+    />
+</head>
+<body style="background: rgb(13, 17, 23); color: rgb(201, 209, 217)">
+<div class="container mt-3">
+    <h1>Mikoto-Pixiv-SSO</h1>
+    <div class="input-group mb-3">
+        <input
+                class="form-control"
+                id="userName"
+                name="userName"
+                placeholder="Username"
+                type="text"
+        />
+    </div>
+    <div class="input-group mb-3">
+        <input
+                class="form-control"
+                id="userPassword"
+                name="userPassword"
+                placeholder="UserPassword"
+                type="password"
+        />
+    </div>
+    <!--/*@thymesVar id="siteKey" type="java.lang.String"*/-->
+    <div
+            class="g-recaptcha"
+            data-sitekey="6Lf17AchAAAAAJDqcTC1vqUZkCrInm1DqAK0Vvnp"
+            th:attr="data-sitekey=${siteKey}"
+    ></div>
+    <br/>
+    <input class="btn btn-primary" id="submit"
+           style="border: rgb(201, 209, 217); background-color: rgb(201, 209, 217); color: rgb(13, 17, 23);"
+           type="submit" value="Submit"/>
+</div>
+
+<script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+<script src="https://www.google.com/recaptcha/api.js"></script>
+<script src="https://cdn.staticfile.org/jsencrypt/3.2.1/jsencrypt.min.js"></script>
+<script>
+    $(function () {
+        $("#submit").click(function () {
+            const encrypt = new JSEncrypt();
+            encrypt.setPublicKey("-----BEGIN PUBLIC KEY-----" + $("#publicKey").val() + "-----END PUBLIC KEY-----");
+            const userName = $("#userName").val();
+            const userPassword = $("#userPassword").val();
+            const json = {
+                "reCaptchaResponse": $("#g-recaptcha-response")[0].value,
+                "name": encrypt.encrypt(userName),
+                "pwd": encrypt.encrypt(userPassword)
+            };
+            $.ajaxSetup({contentType: "application/json; charset=utf-8"});
+            $.post(
+                '/sso/doLogin',
+                JSON.stringify(json),
+                function (data) {
+                    const jsonResult = JSON.parse(data);
+                    if (jsonResult["success"] !== true) {
+                        alert(jsonResult["msg"]);
+                    }
+                }
+            );
+        })
+    })
+</script>
+<!--/*@thymesVar id="publicKey" type="java.lang.String"*/-->
+<input id="publicKey" style="display:none" th:value="${publicKey}"/>
+</body>
+</html>

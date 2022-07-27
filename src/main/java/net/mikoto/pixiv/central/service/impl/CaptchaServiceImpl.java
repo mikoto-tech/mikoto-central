@@ -1,39 +1,41 @@
 package net.mikoto.pixiv.central.service.impl;
 
 import com.alibaba.fastjson2.JSONObject;
-import net.mikoto.pixiv.central.client.RecaptchaClient;
 import net.mikoto.pixiv.central.service.CaptchaService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import okhttp3.*;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.Objects;
 
 /**
  * @author mikoto
- * Created at 2022/7/5, 下午5:12
- * For pixiv-central
+ * Create for pixiv-central
+ * Create at 2022/7/21
  */
-@Service
+@Service("captchaService")
 public class CaptchaServiceImpl implements CaptchaService {
-    private final RecaptchaClient recaptchaClient;
+    public static final String RE_CAPTCHA_CONFIRM_API = "https://www.google.com/recaptcha/api/siteverify";
+    public static final OkHttpClient OK_HTTP_CLIENT = new OkHttpClient();
+    private static final MediaType FROM = MediaType.get("application/x-www-form-urlencoded;charset=utf-8");
+    private static final String SUCCESS_KEY = "success";
 
-    @Value("${mikoto.pixiv.secret}")
-    private String secret;
-
-    @Autowired
-    public CaptchaServiceImpl(RecaptchaClient recaptchaClient) {
-        this.recaptchaClient = recaptchaClient;
-    }
-
-    /**
-     * Verify a captcha.
-     *
-     * @param response The response of the captcha.
-     * @param remoteIp The remote ip of user.
-     * @return The result.
-     */
     @Override
-    public boolean verifyCaptcha(String response, String remoteIp) {
-        JSONObject resultJson = JSONObject.parseObject(recaptchaClient.verifyCaptcha(secret, response, remoteIp));
-        return resultJson.getBooleanValue("success");
+    public boolean verify(String secret, String reCaptchaResponse) throws IOException {
+        String verifyRequestString = "secret=" +
+                secret +
+                "&response=" +
+                reCaptchaResponse;
+        RequestBody body = RequestBody.create(verifyRequestString, FROM);
+        Request verifyRequest = new Request.Builder()
+                .url(RE_CAPTCHA_CONFIRM_API)
+                .post(body)
+                .build();
+        // execute a call
+        Response verifyResponse = OK_HTTP_CLIENT.newCall(verifyRequest).execute();
+        // load json
+        JSONObject verifyResponseJson = JSONObject.parseObject(Objects.requireNonNull(verifyResponse.body()).string());
+        verifyResponse.close();
+        return verifyResponseJson.getBooleanValue(SUCCESS_KEY);
     }
 }
