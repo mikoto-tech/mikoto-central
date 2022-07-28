@@ -70,7 +70,9 @@
                 JSON.stringify(json),
                 function (data) {
                     const jsonResult = JSON.parse(data);
-                    if (jsonResult["success"] !== true) {
+                    if (jsonResult["success"] === true) {
+                        document.body.innerHTML = "<h1>登录成功!</h1><h2>Login success!</h2>";
+                    } else {
                         alert(jsonResult["msg"]);
                     }
                 }

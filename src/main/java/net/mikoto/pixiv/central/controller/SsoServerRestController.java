@@ -14,10 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.crypto.BadPaddingException;
@@ -63,14 +60,23 @@ public class SsoServerRestController {
         this.captchaService = captchaService;
     }
 
-    @RequestMapping("/sso/*")
+    @GetMapping("/")
+    public String index() {
+        return "<script>window.location.replace(\"/index.html\")</script>";
+    }
+
+    @RequestMapping(
+            value = "/sso/*",
+            produces = "application/json;charset=UTF-8"
+    )
     public Object ssoRequest() {
         return SaSsoHandle.serverRequest();
     }
 
     @RequestMapping(
             value = "/sso/doRegister",
-            method = RequestMethod.POST
+            method = RequestMethod.POST,
+            produces = "application/json;charset=UTF-8"
     )
     public JSONObject register(@RequestBody String jsonText) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, InvalidKeyException {
         JSONObject outputJson = new JSONObject();
