@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
  * Create for pixiv-central
  * Create at 2022/7/23
  */
+@SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 @Controller
-public class SsoServerController {
+public class OAuth2ServerController {
     @Value("${mikoto.pixiv.site-key}")
     private String siteKey;
     @Value("${mikoto.pixiv.rsa.public}")
