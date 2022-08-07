@@ -2,7 +2,9 @@ package net.mikoto.pixiv.central.controller;
 
 import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.oauth2.config.SaOAuth2Config;
+import cn.dev33.satoken.oauth2.exception.SaOAuth2Exception;
 import cn.dev33.satoken.oauth2.logic.SaOAuth2Handle;
+import cn.dev33.satoken.oauth2.logic.SaOAuth2Util;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
 import com.alibaba.fastjson2.JSONObject;
@@ -26,6 +28,8 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import static net.mikoto.pixiv.central.util.RandomString.getRandomString;
 import static net.mikoto.pixiv.core.util.RsaUtil.decrypt;
@@ -134,5 +138,25 @@ public class SaOAuth2ServerRestController {
                         throw new RuntimeException(e);
                     }
                 });
+    }
+
+    @RequestMapping(
+            "/oauth2/check"
+    )
+    public JSONObject checkScope(String token, @NotNull String scope) {
+        JSONObject outputJsonObject = new JSONObject();
+        String[] scopes = scope.split(";");
+        Set<String> failedScopes = new HashSet<>();
+
+        try {
+            SaOAuth2Util.checkScope(token, scopes);
+        } catch (SaOAuth2Exception e) {
+            failedScopes.add(e.getMessage().replace("该 Access-Token 不具备 Scope：", ""));
+        }
+
+        outputJsonObject.fluentPut("success", failedScopes.isEmpty());
+        outputJsonObject.fluentPut("failedScopes", failedScopes);
+
+        return outputJsonObject;
     }
 }
