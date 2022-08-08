@@ -154,7 +154,6 @@ public class SaOAuth2ServerRestController {
             failedScopes.add(e.getMessage().replace("该 Access-Token 不具备 Scope：", ""));
         }
 
-        outputJsonObject.fluentPut("success", failedScopes.isEmpty());
         outputJsonObject.fluentPut("failedScopes", failedScopes);
 
         return outputJsonObject;
