@@ -20,17 +20,23 @@
 <div class="container mt-3">
     <h1>Mikoto-Pixiv-OAuth2-Confirm</h1>
     <p>
-        This application (application id:
+        This
+        <!--/*@thymesVar id="clientName" type="java.lang.String"*/-->
+        <span th:utext="${clientName}">ClientName</span>
+        application (application id:
         <!--/*@thymesVar id="clientId" type="java.lang.String"*/-->
-        <span th:text="${clientId}"></span>
+        <span th:utext="${clientId}">ClientId</span>
         ) is trying to get the token of scope:
         <!--/*@thymesVar id="scope" type="java.lang.String"*/-->
-    <h2 th:text="${scope}"></h2>
+    <h2 th:utext="${scope}">Scope</h2>
     </p>
     <br/>
-    <input class="btn btn-primary" id="submit"
+    <input class="btn btn-primary" id="yes"
            style="border: rgb(201, 209, 217); background-color: rgb(201, 209, 217); color: rgb(13, 17, 23);"
-           type="submit" value="Submit"/>
+           type="submit" value="Yes"/>
+    <input class="btn btn-primary" id="no"
+           style="border: rgb(201, 209, 217); background-color: rgb(201, 209, 217); color: rgb(13, 17, 23);"
+           type="submit" value="No"/>
 </div>
 
 <script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
@@ -38,33 +44,85 @@
 <script src="https://cdn.staticfile.org/jsencrypt/3.2.1/jsencrypt.min.js"></script>
 <script>
     $(function () {
-        $("#submit").click(function () {
-            const encrypt = new JSEncrypt();
-            encrypt.setPublicKey("-----BEGIN PUBLIC KEY-----" + $("#publicKey").val() + "-----END PUBLIC KEY-----");
-            const userName = $("#userName").val();
-            const userPassword = $("#userPassword").val();
-            const json = {
-                "reCaptchaResponse": $("#g-recaptcha-response")[0].value,
-                "name": encrypt.encrypt(userName),
-                "pwd": encrypt.encrypt(userPassword)
-            };
-            $.ajaxSetup({contentType: "application/json; charset=utf-8"});
-            $.post(
-                '/oauth2/doLogin',
-                JSON.stringify(json),
-                function (data) {
-                    const jsonResult = JSON.parse(data);
-                    if (jsonResult["success"] === true) {
-                        document.body.innerHTML = "<h1>登录成功!</h1><h2>Login success!</h2>";
+        $("#yes").click(function () {
+            $.ajax({
+                url: '/oauth2/doConfirm',
+                data: {
+                    client_id: getParam('client_id'),
+                    scope: getParam('scope')
+                },
+                dataType: 'json',
+                success: function (res) {
+                    console.log(res);
+                    if (res.code === 200) {
+                        document.body.innerHTML = "<div class=\"container mt-3\"><h1>Confirm success!</h1><h2>You will be directed soon.</h2></div>";
+                        setTimeout(function () {
+                            location.reload();
+                        }, 2000);
                     } else {
-                        alert(jsonResult["msg"]);
+                        document.body.innerHTML = "<div class=\"container mt-3\"><h1>Confirm failed!</h1><h2>You will be directed soon.</h2></div>";
+                        setTimeout(function () {
+                            location.href = joinParam(getParam('redirect_uri'), "handle=failed&state=Love_You_Forever_Lin." + randomString(10));
+                        }, 2000);
                     }
+                },
+                error: function (e) {
+                    console.log('error');
                 }
-            );
+            });
+        });
+
+        $("#no").click(function () {
+            location.href = joinParam(getParam('redirect_uri'), "handle=refuse&state=Love_You_Forever_Lin." + randomString(10));
         })
-    })
+    });
+
+    function randomString(e) {
+        e = e || 32;
+        let t = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678",
+            a = t.length,
+            n = "";
+        for (i = 0; i < e; i++) n += t.charAt(Math.floor(Math.random() * a));
+        return n
+    }
+
+    // 从url中查询到指定名称的参数值
+    function getParam(name, defaultValue) {
+        const query = window.location.search.substring(1);
+        const vars = query.split("&");
+        for (let i = 0; i < vars.length; i++) {
+            const pair = vars[i].split("=");
+            if (pair[0] === name) {
+                return pair[1];
+            }
+        }
+        return (defaultValue === undefined ? null : defaultValue);
+    }
+
+    // 在url上拼接上kv参数并返回
+    function joinParam(url, paramStr) {
+        if (paramStr == null || paramStr.length === 0) {
+            return url;
+        }
+        const index = url.indexOf('?');
+        // ? 不存在
+        if (index === -1) {
+            return url + '?' + paramStr;
+        }
+        // ? 是最后一位
+        if (index === url.length - 1) {
+            return url + paramStr;
+        }
+        // ? 是其中一位
+        if (index > -1 && index < url.length - 1) {
+            // 如果最后一位是 不是&, 且 paramStr 第一位不是 &, 就增送一个 &
+            if (url.lastIndexOf('&') !== url.length - 1 && parameStrindexOf('&') !== 0) {
+                return url + '&' + paramStr;
+            } else {
+                return url + paramStr;
+            }
+        }
+    }
 </script>
-<!--/*@thymesVar id="publicKey" type="java.lang.String"*/-->
-<input id="publicKey" style="display:none" th:value="${publicKey}"/>
 </body>
 </html>

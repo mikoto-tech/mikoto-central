@@ -18,7 +18,12 @@
 </head>
 <body style="background: rgb(13, 17, 23); color: rgb(201, 209, 217)">
 <div class="container mt-3">
-    <h1>Mikoto-Pixiv-OAuth2-Login</h1>
+    <h1>
+        <a href="https://mikoto-pixiv.cc">Mikoto-Pixiv</a> - <a href="https://oauth2.mikoto-pixiv.cc">OAuth2</a>
+    </h1>
+</div>
+
+<div class="container mt-3">
     <div class="input-group mb-3">
         <input
                 class="form-control"
@@ -60,24 +65,30 @@
             encrypt.setPublicKey("-----BEGIN PUBLIC KEY-----" + $("#publicKey").val() + "-----END PUBLIC KEY-----");
             const userName = $("#userName").val();
             const userPassword = $("#userPassword").val();
-            const json = {
-                "reCaptchaResponse": $("#g-recaptcha-response")[0].value,
-                "name": encrypt.encrypt(userName),
-                "pwd": encrypt.encrypt(userPassword)
-            };
             $.ajaxSetup({contentType: "application/json; charset=utf-8"});
-            $.post(
-                '/oauth2/doLogin',
-                JSON.stringify(json),
-                function (data) {
-                    const jsonResult = JSON.parse(data);
-                    if (jsonResult["success"] === true) {
-                        document.body.innerHTML = "<h1>Login success!</h1>";
+            $.ajax({
+                url: '/oauth2/doLogin',
+                data: {
+                    "reCaptchaResponse": $("#g-recaptcha-response")[0].value,
+                    "name": encrypt.encrypt(userName),
+                    "pwd": encrypt.encrypt(userPassword)
+                },
+                dataType: 'json',
+                success: function (res) {
+                    if (res.code === 200) {
+                        document.body.innerHTML = "<div class=\"container mt-3\"><h1>Login success!</h1><h2>You will be directed soon.</h2></div>";
+                        setTimeout(function () {
+                            location.reload();
+                        }, 2000);
                     } else {
-                        alert(jsonResult["msg"]);
+                        layer.alert(res.msg);
                     }
+                },
+                error: function (e) {
+                    console.log('error');
                 }
-            );
+            });
+
         })
     })
 </script>

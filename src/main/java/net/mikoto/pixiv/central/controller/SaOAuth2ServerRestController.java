@@ -14,6 +14,7 @@ import net.mikoto.pixiv.central.dao.UserRepository;
 import net.mikoto.pixiv.central.service.CaptchaService;
 import net.mikoto.pixiv.core.model.Client;
 import net.mikoto.pixiv.core.model.User;
+import net.mikoto.pixiv.core.util.Sha256Util;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -137,17 +138,20 @@ public class SaOAuth2ServerRestController {
                                 return SaResult.error("No such a user!");
                             }
 
-                            String userPassword = userRawPassword +
+                            String userPassword = Sha256Util.getSha256(userRawPassword +
                                     "|MIKOTO_PIXIV_OAuth2|" +
                                     user.getUserSalt() +
-                                    "|LOVE YOU FOREVER, Lin.";
+                                    "|LOVE YOU FOREVER, Lin.");
 
                             if (user.getUserPassword().equals(userPassword)) {
                                 StpUtil.login(user.getUserId());
                                 return SaResult.ok("Login success!").setData(StpUtil.getTokenValue());
+                            } else {
+                                return SaResult.error("Wrong password");
                             }
+                        } else {
+                            return SaResult.error("Verify your recaptcha response failed.");
                         }
-                        return SaResult.error("Login failed");
                     } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
                              IllegalBlockSizeException | BadPaddingException | IOException |
                              InvalidKeySpecException e) {
@@ -157,6 +161,8 @@ public class SaOAuth2ServerRestController {
 
                 .setConfirmView((clientId, scope) -> {
                     ModelAndView modelAndView = new ModelAndView("confirm");
+                    Client client = clientRepository.getById(Integer.valueOf(clientId));
+                    modelAndView.addObject("clientName", client.getClientName());
                     modelAndView.addObject("clientId", clientId);
                     modelAndView.addObject("scope", scope);
                     return modelAndView;
