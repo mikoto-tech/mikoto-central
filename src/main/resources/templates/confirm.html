@@ -4,7 +4,7 @@
     <meta charset="UTF-8"/>
     <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Mikoto-Pixiv-OAuth2-Login</title>
+    <title>Mikoto-Pixiv-OAuth2-Confirm</title>
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
     <link
             href="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/css/bootstrap.min.css"
@@ -18,31 +18,15 @@
 </head>
 <body style="background: rgb(13, 17, 23); color: rgb(201, 209, 217)">
 <div class="container mt-3">
-    <h1>Mikoto-Pixiv-SSO</h1>
-    <div class="input-group mb-3">
-        <input
-                class="form-control"
-                id="userName"
-                name="userName"
-                placeholder="Username"
-                type="text"
-        />
-    </div>
-    <div class="input-group mb-3">
-        <input
-                class="form-control"
-                id="userPassword"
-                name="userPassword"
-                placeholder="UserPassword"
-                type="password"
-        />
-    </div>
-    <!--/*@thymesVar id="siteKey" type="java.lang.String"*/-->
-    <div
-            class="g-recaptcha"
-            data-sitekey="6Lf17AchAAAAAJDqcTC1vqUZkCrInm1DqAK0Vvnp"
-            th:attr="data-sitekey=${siteKey}"
-    ></div>
+    <h1>Mikoto-Pixiv-OAuth2-Confirm</h1>
+    <p>
+        This application (application id:
+        <!--/*@thymesVar id="clientId" type="java.lang.String"*/-->
+        <span th:text="${clientId}"></span>
+        ) is trying to get the token of scope:
+        <!--/*@thymesVar id="scope" type="java.lang.String"*/-->
+    <h2 th:text="${scope}"></h2>
+    </p>
     <br/>
     <input class="btn btn-primary" id="submit"
            style="border: rgb(201, 209, 217); background-color: rgb(201, 209, 217); color: rgb(13, 17, 23);"

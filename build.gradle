@@ -22,7 +22,7 @@ dependencies {
     implementation 'cn.dev33:sa-token-spring-boot-starter:1.30.0'
 
     // Mikoto
-    implementation 'net.mikoto.pixiv:pixiv-core:1.4.3-snapshot-1'
+    implementation 'net.mikoto.pixiv:pixiv-core:1.4.4-snapshot-1'
 
     // Others
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'

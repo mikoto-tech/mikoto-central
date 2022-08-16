@@ -27,7 +27,7 @@ public class SaOAuth2TemplateImpl extends SaOAuth2Template {
     @SuppressWarnings("AlibabaSwitchStatement")
     @Override
     public SaClientModel getClientModel(String clientId) {
-        Client client = clientRepository.getClientByClientId(Integer.parseInt(clientId));
+        Client client = clientRepository.getById(Integer.parseInt(clientId));
         return new SaClientModel()
                 .setClientId(clientId)
                 .setClientSecret(client.getClientSecret())

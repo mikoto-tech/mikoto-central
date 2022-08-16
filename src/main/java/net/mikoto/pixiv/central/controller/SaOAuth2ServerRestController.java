@@ -7,11 +7,15 @@ import cn.dev33.satoken.oauth2.logic.SaOAuth2Handle;
 import cn.dev33.satoken.oauth2.logic.SaOAuth2Util;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import net.mikoto.pixiv.central.dao.ClientRepository;
 import net.mikoto.pixiv.central.dao.UserRepository;
 import net.mikoto.pixiv.central.service.CaptchaService;
+import net.mikoto.pixiv.core.model.Client;
 import net.mikoto.pixiv.core.model.User;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -58,12 +62,21 @@ public class SaOAuth2ServerRestController {
     private String secret;
 
     @Qualifier("captchaService")
-    private CaptchaService captchaService;
+    private final CaptchaService captchaService;
     @Qualifier("userRepository")
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    @Qualifier("clientRepository")
+    private final ClientRepository clientRepository;
+
+    @Autowired
+    public SaOAuth2ServerRestController(CaptchaService captchaService, UserRepository userRepository, ClientRepository clientRepository) {
+        this.captchaService = captchaService;
+        this.userRepository = userRepository;
+        this.clientRepository = clientRepository;
+    }
 
     @RequestMapping(
-            value = "/sso/doRegister",
+            value = "/oauth2/doRegister",
             method = RequestMethod.POST,
             produces = "application/json;charset=UTF-8"
     )
@@ -79,7 +92,7 @@ public class SaOAuth2ServerRestController {
             user.setUserPassword(
                     getSha256(
                             decrypt(inputJson.getString(USER_PASSWORD), getPrivateKey(privateKey)) +
-                                    "|MIKOTO_PIXIV_SSO|" +
+                                    "|MIKOTO_PIXIV_OAuth2|" +
                                     user.getUserSalt() +
                                     "|LOVE YOU FOREVER, Lin."
                     )
@@ -96,10 +109,12 @@ public class SaOAuth2ServerRestController {
         return outputJson;
     }
 
+    @RequestMapping("/oauth2/*")
     public Object request() {
         return SaOAuth2Handle.serverRequest();
     }
 
+    @Autowired
     public void setSaOauth2Config(@NotNull SaOAuth2Config config) {
         config
                 .setNotLoginView(() -> {
@@ -108,6 +123,7 @@ public class SaOAuth2ServerRestController {
                     modelAndView.addObject("siteKey", siteKey);
                     return modelAndView;
                 })
+
                 .setDoLoginHandle((encryptedUserName, encryptedUserRawPassword) -> {
                     try {
                         String reCaptchaResponse = SaHolder.getRequest().getParam("reCaptchaResponse");
@@ -122,7 +138,7 @@ public class SaOAuth2ServerRestController {
                             }
 
                             String userPassword = userRawPassword +
-                                    "|MIKOTO_PIXIV_SSO|" +
+                                    "|MIKOTO_PIXIV_OAuth2|" +
                                     user.getUserSalt() +
                                     "|LOVE YOU FOREVER, Lin.";
 
@@ -137,7 +153,15 @@ public class SaOAuth2ServerRestController {
                              InvalidKeySpecException e) {
                         throw new RuntimeException(e);
                     }
-                });
+                })
+
+                .setConfirmView((clientId, scope) -> {
+                    ModelAndView modelAndView = new ModelAndView("confirm");
+                    modelAndView.addObject("clientId", clientId);
+                    modelAndView.addObject("scope", scope);
+                    return modelAndView;
+                })
+        ;
     }
 
     @RequestMapping(
@@ -151,10 +175,39 @@ public class SaOAuth2ServerRestController {
         try {
             SaOAuth2Util.checkScope(token, scopes);
         } catch (SaOAuth2Exception e) {
-            failedScopes.add(e.getMessage().replace("该 Access-Token 不具备 Scope：", ""));
+            failedScopes.add(e.getMessage().replace("This Access-Token don't have scope：", ""));
         }
 
         outputJsonObject.fluentPut("failedScopes", failedScopes);
+
+        return outputJsonObject;
+    }
+
+    @RequestMapping(
+            "/oauth2/addClient"
+    )
+    public JSONObject registerClient(String clientName, String clientSecret, String allowUrl, String contractScope) {
+        JSONObject outputJsonObject = new JSONObject();
+
+        Client client = new Client();
+        client.setClientName(clientName);
+        client.setClientSecret(clientSecret);
+        client.setAllowUrl(allowUrl);
+        client.setContractScope(contractScope);
+
+        try {
+            clientRepository.saveAndFlush(client);
+            client = clientRepository.getClientByClientName(clientName);
+        } catch (Exception e) {
+            outputJsonObject.put("success", false);
+            outputJsonObject.put("msg", e.getMessage());
+            outputJsonObject.put("body", "");
+            return outputJsonObject;
+        }
+
+        outputJsonObject.put("success", true);
+        outputJsonObject.put("msg", "");
+        outputJsonObject.put("body", JSON.toJSON(client));
 
         return outputJsonObject;
     }
