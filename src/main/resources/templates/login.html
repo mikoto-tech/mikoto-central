@@ -67,7 +67,7 @@
             };
             $.ajaxSetup({contentType: "application/json; charset=utf-8"});
             $.post(
-                '/sso/doLogin',
+                '/oauth2/doLogin',
                 JSON.stringify(json),
                 function (data) {
                     const jsonResult = JSON.parse(data);

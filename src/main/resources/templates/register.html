@@ -77,7 +77,7 @@
                 };
                 $.ajaxSetup({contentType: "application/json; charset=utf-8"});
                 $.post(
-                    '/sso/doRegister',
+                    '/oauth2/doRegister',
                     JSON.stringify(json),
                     function (data) {
                         const jsonResult = JSON.parse(data);
