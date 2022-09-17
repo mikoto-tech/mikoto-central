@@ -1,6 +1,6 @@
 package net.mikoto.central.dao;
 
-import net.mikoto.pixiv.core.model.User;
+import net.mikoto.oauth2.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

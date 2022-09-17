@@ -12,9 +12,9 @@ import com.alibaba.fastjson2.JSONObject;
 import net.mikoto.central.dao.ClientRepository;
 import net.mikoto.central.dao.UserRepository;
 import net.mikoto.central.service.CaptchaService;
-import net.mikoto.pixiv.core.model.Client;
-import net.mikoto.pixiv.core.model.User;
-import net.mikoto.pixiv.core.util.Sha256Util;
+import net.mikoto.central.util.Sha256Util;
+import net.mikoto.oauth2.model.Client;
+import net.mikoto.oauth2.model.User;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -37,9 +37,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static net.mikoto.central.util.RandomString.getRandomString;
-import static net.mikoto.pixiv.core.util.RsaUtil.decrypt;
-import static net.mikoto.pixiv.core.util.RsaUtil.getPrivateKey;
-import static net.mikoto.pixiv.core.util.Sha256Util.getSha256;
+import static net.mikoto.central.util.RsaUtil.decrypt;
+import static net.mikoto.central.util.RsaUtil.getPrivateKey;
+import static net.mikoto.central.util.Sha256Util.getSha256;
 
 /**
  * @author mikoto
