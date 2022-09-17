@@ -4,7 +4,7 @@
     <meta charset="UTF-8"/>
     <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Mikoto-Pixiv-OAuth2-Confirm</title>
+    <title>Mikoto-OAuth2-Confirm</title>
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
     <link
             href="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/css/bootstrap.min.css"
@@ -18,7 +18,7 @@
 </head>
 <body style="background: rgb(13, 17, 23); color: rgb(201, 209, 217)">
 <div class="container mt-3">
-    <h1>Mikoto-Pixiv-OAuth2-Confirm</h1>
+    <h1>Mikoto-OAuth2-Confirm</h1>
     <p>
         This
         <!--/*@thymesVar id="clientName" type="java.lang.String"*/-->
@@ -116,7 +116,7 @@
         // ? 是其中一位
         if (index > -1 && index < url.length - 1) {
             // 如果最后一位是 不是&, 且 paramStr 第一位不是 &, 就增送一个 &
-            if (url.lastIndexOf('&') !== url.length - 1 && parameStrindexOf('&') !== 0) {
+            if (url.lastIndexOf('&') !== url.length - 1 && paramStr.indexOf('&') !== 0) {
                 return url + '&' + paramStr;
             } else {
                 return url + paramStr;

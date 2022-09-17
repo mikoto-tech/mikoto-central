@@ -1,7 +1,7 @@
-package net.mikoto.pixiv.central.service.impl;
+package net.mikoto.central.service.impl;
 
 import com.alibaba.fastjson2.JSONObject;
-import net.mikoto.pixiv.central.service.CaptchaService;
+import net.mikoto.central.service.CaptchaService;
 import okhttp3.*;
 import org.springframework.stereotype.Service;
 

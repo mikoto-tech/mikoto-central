@@ -1,4 +1,4 @@
-package net.mikoto.pixiv.central.controller;
+package net.mikoto.central.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;

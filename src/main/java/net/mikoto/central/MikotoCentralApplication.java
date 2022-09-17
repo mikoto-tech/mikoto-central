@@ -1,4 +1,4 @@
-package net.mikoto.pixiv.central;
+package net.mikoto.central;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,8 +9,8 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
  */
 @SpringBootApplication
 @EntityScan("net.mikoto.pixiv.core.model")
-public class PixivCentralApplication {
+public class MikotoCentralApplication {
     public static void main(String[] args) {
-        SpringApplication.run(PixivCentralApplication.class, args);
+        SpringApplication.run(MikotoCentralApplication.class, args);
     }
 }

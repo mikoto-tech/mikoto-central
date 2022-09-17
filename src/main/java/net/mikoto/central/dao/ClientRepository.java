@@ -1,4 +1,4 @@
-package net.mikoto.pixiv.central.dao;
+package net.mikoto.central.dao;
 
 import net.mikoto.pixiv.core.model.Client;
 import org.springframework.data.jpa.repository.JpaRepository;

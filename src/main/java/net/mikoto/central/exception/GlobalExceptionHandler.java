@@ -1,4 +1,4 @@
-package net.mikoto.pixiv.central.exception;
+package net.mikoto.central.exception;
 
 import cn.dev33.satoken.util.SaResult;
 import org.jetbrains.annotations.NotNull;

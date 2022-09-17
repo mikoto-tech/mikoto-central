@@ -1,4 +1,4 @@
-package net.mikoto.pixiv.central.service;
+package net.mikoto.central.service;
 
 import java.io.IOException;
 

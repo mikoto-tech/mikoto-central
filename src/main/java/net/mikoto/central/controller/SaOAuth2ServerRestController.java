@@ -1,4 +1,4 @@
-package net.mikoto.pixiv.central.controller;
+package net.mikoto.central.controller;
 
 import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.oauth2.config.SaOAuth2Config;
@@ -9,9 +9,9 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import net.mikoto.pixiv.central.dao.ClientRepository;
-import net.mikoto.pixiv.central.dao.UserRepository;
-import net.mikoto.pixiv.central.service.CaptchaService;
+import net.mikoto.central.dao.ClientRepository;
+import net.mikoto.central.dao.UserRepository;
+import net.mikoto.central.service.CaptchaService;
 import net.mikoto.pixiv.core.model.Client;
 import net.mikoto.pixiv.core.model.User;
 import net.mikoto.pixiv.core.util.Sha256Util;
@@ -36,7 +36,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import static net.mikoto.pixiv.central.util.RandomString.getRandomString;
+import static net.mikoto.central.util.RandomString.getRandomString;
 import static net.mikoto.pixiv.core.util.RsaUtil.decrypt;
 import static net.mikoto.pixiv.core.util.RsaUtil.getPrivateKey;
 import static net.mikoto.pixiv.core.util.Sha256Util.getSha256;
