@@ -1,4 +1,4 @@
-package net.mikoto.central.dao;
+package net.mikoto.central.repository;
 
 import net.mikoto.oauth2.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;

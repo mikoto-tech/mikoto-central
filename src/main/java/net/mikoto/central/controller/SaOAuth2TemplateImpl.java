@@ -2,7 +2,7 @@ package net.mikoto.central.controller;
 
 import cn.dev33.satoken.oauth2.logic.SaOAuth2Template;
 import cn.dev33.satoken.oauth2.model.SaClientModel;
-import net.mikoto.central.dao.ClientRepository;
+import net.mikoto.central.repository.ClientRepository;
 import net.mikoto.oauth2.model.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

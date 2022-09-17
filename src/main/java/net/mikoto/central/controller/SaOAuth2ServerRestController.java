@@ -9,8 +9,8 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import net.mikoto.central.dao.ClientRepository;
-import net.mikoto.central.dao.UserRepository;
+import net.mikoto.central.repository.ClientRepository;
+import net.mikoto.central.repository.UserRepository;
 import net.mikoto.central.service.CaptchaService;
 import net.mikoto.central.util.Sha256Util;
 import net.mikoto.oauth2.model.Client;
@@ -49,13 +49,13 @@ import static net.mikoto.central.util.Sha256Util.getSha256;
 @SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 @RestController
 public class SaOAuth2ServerRestController {
-    public static final String RE_CAPTCHA_RESPONSE = "reCaptchaResponse";
-    public static final String USER_NAME = "userName";
-    public static final String USER_PASSWORD = "userPassword";
+    private static final String RE_CAPTCHA_RESPONSE = "reCaptchaResponse";
+    private static final String USER_NAME = "userName";
+    private static final String USER_PASSWORD = "userPassword";
 
     @Value("${mikoto.pixiv.site-key}")
     private String siteKey;
-    @Value("${mikoto.pixiv.rsa.public}")
+    @Value("    ${mikoto.pixiv.rsa.public}")
     private String publicKey;
     @Value("${mikoto.pixiv.rsa.private}")
     private String privateKey;

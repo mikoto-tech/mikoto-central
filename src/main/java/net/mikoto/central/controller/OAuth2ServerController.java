@@ -1,7 +1,7 @@
 package net.mikoto.central.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
-import net.mikoto.central.dao.UserRepository;
+import net.mikoto.central.repository.UserRepository;
 import net.mikoto.oauth2.model.User;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
