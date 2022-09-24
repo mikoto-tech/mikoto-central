@@ -4,7 +4,7 @@
     <meta charset="UTF-8"/>
     <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Mikoto-OAuth2-Register</title>
+    <title>Mikoto-OAuth2-Client-Register</title>
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
     <link
             href="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/css/bootstrap.min.css"
@@ -26,26 +26,36 @@
     <div class="input-group mb-3">
         <input
                 class="form-control"
-                id="userName"
-                name="userName"
-                placeholder="Username"
+                id="clientName"
+                name="clientName"
+                placeholder="ClientName"
                 type="text"
         />
     </div>
     <div class="input-group mb-3">
         <input
                 class="form-control"
-                id="userPassword"
-                name="userPassword"
-                placeholder="UserPassword"
+                id="clientSecret"
+                name="clientSecret"
+                placeholder="ClientSecret"
                 type="password"
         />
-        <span>&nbsp;</span>
+    </div>
+    <div class="input-group mb-3">
         <input
                 class="form-control"
-                id="userPasswordConfirm"
-                name="userPasswordConfirm"
-                placeholder="Confirm"
+                id="contractScope"
+                name="contractScope"
+                placeholder="ContractScope"
+                type="password"
+        />
+    </div>
+    <div class="input-group mb-3">
+        <input
+                class="form-control"
+                id="allowUrl"
+                name="allowUrl"
+                placeholder="AllowUrl"
                 type="password"
         />
     </div>
@@ -59,7 +69,6 @@
     <input class="btn btn-primary" id="submit"
            style="border: rgb(201, 209, 217); background-color: rgb(201, 209, 217); color: rgb(13, 17, 23);"
            type="submit" value="Submit"/>
-    Already have a account? <a href="/login">Login</a>
 </div>
 
 <script src="https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js"></script>
