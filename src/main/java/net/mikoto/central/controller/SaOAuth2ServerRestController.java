@@ -7,17 +7,14 @@ import cn.dev33.satoken.oauth2.logic.SaOAuth2Handle;
 import cn.dev33.satoken.oauth2.logic.SaOAuth2Util;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
-import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import net.mikoto.central.repository.ClientRepository;
-import net.mikoto.central.repository.UserRepository;
 import net.mikoto.central.service.CaptchaService;
-import net.mikoto.central.util.Sha256Util;
+import net.mikoto.central.service.UserService;
 import net.mikoto.oauth2.model.Client;
 import net.mikoto.oauth2.model.User;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,14 +29,11 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import static net.mikoto.central.util.RandomString.getRandomString;
 import static net.mikoto.central.util.RsaUtil.decrypt;
 import static net.mikoto.central.util.RsaUtil.getPrivateKey;
-import static net.mikoto.central.util.Sha256Util.getSha256;
 
 /**
  * @author mikoto
@@ -62,17 +56,15 @@ public class SaOAuth2ServerRestController {
     @Value("${mikoto.pixiv.secret}")
     private String secret;
 
-    @Qualifier("captchaService")
     private final CaptchaService captchaService;
-    @Qualifier("userRepository")
-    private final UserRepository userRepository;
-    @Qualifier("clientRepository")
+    private final UserService userService;
     private final ClientRepository clientRepository;
 
+
     @Autowired
-    public SaOAuth2ServerRestController(CaptchaService captchaService, UserRepository userRepository, ClientRepository clientRepository) {
+    public SaOAuth2ServerRestController(CaptchaService captchaService, UserService userService, ClientRepository clientRepository) {
         this.captchaService = captchaService;
-        this.userRepository = userRepository;
+        this.userService = userService;
         this.clientRepository = clientRepository;
     }
 
@@ -86,20 +78,10 @@ public class SaOAuth2ServerRestController {
         JSONObject inputJson = JSONObject.parseObject(jsonText);
 
         if (captchaService.verify(secret, inputJson.getString(RE_CAPTCHA_RESPONSE))) {
-            User user = new User();
-            user.setCreateTime(new Date());
-            user.setUserName(decrypt(inputJson.getString(USER_NAME), getPrivateKey(privateKey)));
-            user.setUserSalt(getRandomString(10));
-            user.setUserPassword(
-                    getSha256(
-                            decrypt(inputJson.getString(USER_PASSWORD), getPrivateKey(privateKey)) +
-                                    "|MIKOTO_PIXIV_OAuth2|" +
-                                    user.getUserSalt() +
-                                    "|LOVE YOU FOREVER, Lin."
-                    )
+            userService.register(
+                    decrypt(inputJson.getString(USER_NAME), getPrivateKey(privateKey)),
+                    decrypt(inputJson.getString(USER_PASSWORD), getPrivateKey(privateKey))
             );
-            user.setUpdateTime(new Date());
-            userRepository.saveAndFlush(user);
             outputJson.fluentPut("success", true);
             outputJson.fluentPut("msg", "");
         } else {
@@ -132,18 +114,13 @@ public class SaOAuth2ServerRestController {
                         if (captchaService.verify(secret, reCaptchaResponse)) {
                             String userName = decrypt(encryptedUserName, getPrivateKey(privateKey));
                             String userRawPassword = decrypt(encryptedUserRawPassword, getPrivateKey(privateKey));
-                            User user = userRepository.getUserByUserName(userName);
+                            User user = userService.get(userName);
 
                             if (user == null) {
                                 return SaResult.error("No such a user!");
                             }
 
-                            String userPassword = Sha256Util.getSha256(userRawPassword +
-                                    "|MIKOTO_PIXIV_OAuth2|" +
-                                    user.getUserSalt() +
-                                    "|LOVE YOU FOREVER, Lin.");
-
-                            if (user.getUserPassword().equals(userPassword)) {
+                            if (userService.verify(user, userRawPassword)) {
                                 StpUtil.login(user.getUserId());
                                 return SaResult.ok("Login success!").setData(StpUtil.getTokenValue());
                             } else {
@@ -185,35 +162,6 @@ public class SaOAuth2ServerRestController {
         }
 
         outputJsonObject.fluentPut("failedScopes", failedScopes);
-
-        return outputJsonObject;
-    }
-
-    @RequestMapping(
-            "/oauth2/addClient"
-    )
-    public JSONObject registerClient(String clientName, String clientSecret, String allowUrl, String contractScope) {
-        JSONObject outputJsonObject = new JSONObject();
-
-        Client client = new Client();
-        client.setClientName(clientName);
-        client.setClientSecret(clientSecret);
-        client.setAllowUrl(allowUrl);
-        client.setContractScope(contractScope);
-
-        try {
-            clientRepository.saveAndFlush(client);
-            client = clientRepository.getClientByClientName(clientName);
-        } catch (Exception e) {
-            outputJsonObject.put("success", false);
-            outputJsonObject.put("msg", e.getMessage());
-            outputJsonObject.put("body", "");
-            return outputJsonObject;
-        }
-
-        outputJsonObject.put("success", true);
-        outputJsonObject.put("msg", "");
-        outputJsonObject.put("body", JSON.toJSON(client));
 
         return outputJsonObject;
     }

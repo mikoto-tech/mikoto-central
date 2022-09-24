@@ -1,8 +1,7 @@
 package net.mikoto.central.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
-import net.mikoto.central.repository.UserRepository;
-import net.mikoto.oauth2.model.User;
+import net.mikoto.central.service.UserService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,11 +22,11 @@ public class OAuth2ServerController {
     private String siteKey;
     @Value("${mikoto.pixiv.rsa.public}")
     private String publicKey;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Autowired
-    public OAuth2ServerController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public OAuth2ServerController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping("/register")
@@ -55,13 +54,10 @@ public class OAuth2ServerController {
     @GetMapping("/profile")
     public String profile(Model model) {
         if (StpUtil.isLogin()) {
-            User user = userRepository.getUserByUserId(StpUtil.getLoginIdAsInt());
-            model.addAttribute("user", user);
+            model.addAttribute("user", userService.get(StpUtil.getLoginIdAsInt()));
             return "profile";
         } else {
-            model.addAttribute("siteKey", siteKey);
-            model.addAttribute("publicKey", publicKey);
-            return "login";
+            return "redirect:/login";
         }
     }
 
@@ -75,3 +71,4 @@ public class OAuth2ServerController {
         }
     }
 }
+

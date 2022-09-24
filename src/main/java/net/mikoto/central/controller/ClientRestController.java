@@ -86,19 +86,10 @@ public class ClientRestController {
     public JSONObject get(String clientName) throws NoSuchAlgorithmException, InvalidKeySpecException, IOException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         JSONObject outputJson = new JSONObject();
 
-        if (captchaService.verify(secret, inputJson.getString(RE_CAPTCHA_RESPONSE))) {
-            Client client = new Client();
-            client.setClientName(inputJson.getString(CLIENT_NAME));
-            client.setClientSecret(decrypt(inputJson.getString(CLIENT_SECRET), getPrivateKey(privateKey)));
-            client.setAllowUrl(inputJson.getString(ALLOW_URL));
-            client.setContractScope(inputJson.getString(CONTRACT_SCOPE));
-            clientRepository.saveAndFlush(client);
-            outputJson.fluentPut("success", true);
-            outputJson.fluentPut("msg", "");
-        } else {
-            outputJson.fluentPut("success", false);
-            outputJson.fluentPut("msg", "Cannot verify your reCaptcha response.");
-        }
+        Client client = clientRepository.getClientByClientName(clientName);
+
+        outputJson.fluentPut("success", client != null);
+        outputJson.fluentPut("body", client);
 
         return outputJson;
     }
