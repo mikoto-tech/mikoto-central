@@ -25,7 +25,7 @@ dependencies {
 
     // Others
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
-    implementation 'com.alibaba.fastjson2:fastjson2:2.0.13'
+    implementation 'com.alibaba.fastjson2:fastjson2:2.0.14'
     implementation 'commons-io:commons-io:2.11.0'
     implementation 'commons-codec:commons-codec:1.15'
     implementation 'org.apache.commons:commons-pool2'
